@@ -1,0 +1,646 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloudNova | Cloud Service Platform</title>
+
+<style>
+:root{
+  --primary:#6255e7;
+  --dark:#20213b;
+  --muted:#8589a3;
+  --bg:#f6f7fc;
+  --border:#e9eaf2;
+  --white:#fff;
+  --green:#159b72;
+  --red:#d94c61;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--dark)}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:245px;background:#fff;border-right:1px solid var(--border);padding:25px 17px;position:fixed;inset:0 auto 0 0;z-index:5;display:flex;flex-direction:column}
+.brand{font-size:23px;font-weight:800;color:var(--primary);padding:4px 12px 32px}
+.brand span{color:var(--dark)}
+.nav-label{font-size:10px;letter-spacing:1.5px;color:#a3a5b6;font-weight:800;padding:12px}
+.nav-btn{width:100%;display:flex;align-items:center;gap:12px;padding:13px 14px;border:0;background:transparent;color:#777b95;border-radius:9px;text-align:left;margin:3px 0;font-size:13px;font-weight:600}
+.nav-btn:hover,.nav-btn.active{background:#f0efff;color:var(--primary)}
+.nav-icon{width:20px;font-size:17px;text-align:center}
+.sidebar-bottom{margin-top:auto;padding:15px 12px;background:#f5f4ff;border-radius:12px;font-size:12px}
+.sidebar-bottom strong{display:block;margin-bottom:5px}
+.sidebar-bottom p{color:var(--muted);margin-bottom:12px}
+.main{margin-left:245px;width:calc(100% - 245px);min-width:0}
+.topbar{height:75px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 35px;position:sticky;top:0;z-index:4;gap:15px}
+.topbar-title{font-size:19px;font-weight:750}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.icon-btn{border:1px solid var(--border);background:#fff;padding:9px 12px;border-radius:9px}
+.avatar{width:37px;height:37px;background:#e9e6ff;color:var(--primary);border-radius:50%;display:grid;place-items:center;font-weight:800}
+.content{padding:30px 35px;max-width:1500px;margin:auto}
+.page{display:none}
+.page.active{display:block}
+.welcome{background:linear-gradient(115deg,#5549d7,#8174f2);color:white;border-radius:17px;padding:32px;display:flex;justify-content:space-between;align-items:center;gap:20px;overflow:hidden}
+.welcome h1{font-size:clamp(25px,3vw,35px);margin-bottom:10px;line-height:1.2}
+.welcome p{font-size:13px;color:#e5e2ff;max-width:470px;line-height:1.8}
+.welcome-art{font-size:90px;opacity:.9;padding:0 25px}
+.btn{border:0;border-radius:8px;padding:11px 15px;font-size:12px;font-weight:750;transition:.2s}
+.btn:hover{filter:brightness(.96);transform:translateY(-1px)}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-white{background:#fff;color:var(--primary);margin-top:20px}
+.btn-light{background:#f0efff;color:var(--primary)}
+.btn-danger{background:#fff0f1;color:var(--red)}
+.btn-outline{border:1px solid var(--border);background:#fff;color:#555970}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:15px;margin:30px 0 18px}
+.section-head h2{font-size:20px;margin-bottom:4px}
+.subtext{font-size:12px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:17px;margin:24px 0 30px}
+.stat-card{background:#fff;padding:20px;border:1px solid var(--border);border-radius:13px;min-width:0}
+.stat-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:17px}
+.stat-icon{width:39px;height:39px;display:grid;place-items:center;background:#f0efff;color:var(--primary);border-radius:10px;font-size:20px}
+.stat-card h3{font-size:25px;margin-bottom:4px;overflow-wrap:anywhere}
+.stat-card p{font-size:12px;color:var(--muted)}
+.service-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}
+.service-card{background:white;border:1px solid var(--border);border-radius:14px;padding:23px;transition:.2s}
+.service-card:hover{border-color:#c9c3ff;box-shadow:0 10px 30px #24204d0b;transform:translateY(-3px)}
+.service-icon{width:50px;height:50px;background:#f0efff;border-radius:12px;display:grid;place-items:center;font-size:25px;margin-bottom:17px}
+.service-card h3{font-size:17px;margin-bottom:8px}
+.service-card p{font-size:12px;line-height:1.8;color:var(--muted);min-height:44px}
+.service-price{font-size:24px;font-weight:800;margin:18px 0 14px}
+.service-price small{font-size:11px;font-weight:400;color:var(--muted)}
+.service-footer{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:15px;gap:10px}
+.tag{font-size:10px;font-weight:800;padding:6px 9px;border-radius:20px;background:#e4f8ef;color:var(--green)}
+.panel{background:#fff;border:1px solid var(--border);border-radius:13px;padding:22px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}
+.toolbar input,.toolbar select{padding:11px 12px;border:1px solid var(--border);border-radius:8px;background:#fff;outline:none;color:var(--dark);min-width:145px}
+.toolbar input{flex:1;min-width:200px}
+.table-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:12px;min-width:750px}
+th{text-align:left;background:#fafaff;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.7px}
+th,td{padding:16px 13px;border-bottom:1px solid var(--border)}
+tbody tr:last-child td{border-bottom:0}
+td strong{font-size:12px}
+.status{display:inline-block;padding:6px 9px;border-radius:20px;font-size:10px;font-weight:800;background:#e4f8ef;color:var(--green)}
+.status.cancelled{background:#fff0f1;color:var(--red)}
+.status.pending{background:#fff5db;color:#a8750a}
+.empty{padding:35px 15px;text-align:center;color:var(--muted);font-size:13px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field{display:flex;flex-direction:column;gap:7px}
+.field.full{grid-column:1/-1}
+.field label{font-size:12px;font-weight:750}
+.field input,.field select{width:100%;padding:12px;border:1px solid var(--border);border-radius:8px;outline:none;background:white;color:var(--dark)}
+.field input:focus,.field select:focus{border-color:var(--primary)}
+.price-box{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;background:#f2f0ff;padding:17px;border-radius:10px}
+.price-box strong{color:var(--primary);font-size:21px}
+.notice{padding:12px;border-radius:8px;font-size:12px;margin-bottom:15px;display:none}
+.notice.show{display:block}
+.notice.success{background:#e4f8ef;color:#117852}
+.notice.error{background:#fff0f1;color:#b32f45}
+.settings-card{max-width:650px}
+.settings-card h3{margin-bottom:20px}
+.profile-box{display:flex;align-items:center;gap:15px;margin-bottom:25px}
+.profile-box .avatar{width:55px;height:55px;font-size:21px}
+footer{text-align:center;padding:25px;color:var(--muted);font-size:11px}
+.mobile-menu{display:none}
+.overlay{position:fixed;inset:0;background:#17172d99;display:none;align-items:center;justify-content:center;padding:20px;z-index:20}
+.overlay.open{display:flex}
+.modal{width:100%;max-width:500px;background:#fff;border-radius:16px;padding:26px;max-height:90vh;overflow-y:auto}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:10px}
+.modal-head h2{font-size:21px}
+.close-btn{border:0;background:#f1f1f8;border-radius:8px;padding:8px 11px}
+.toast{position:fixed;right:25px;bottom:25px;z-index:40;background:#24243d;color:white;padding:15px 20px;border-radius:10px;box-shadow:0 10px 30px #0002;display:none;max-width:calc(100% - 40px);font-size:13px}
+.toast.show{display:block}
+@media(max-width:1100px){
+ .sidebar{width:205px}.main{margin-left:205px;width:calc(100% - 205px)}
+ .content{padding:25px 22px}.topbar{padding:0 22px}
+ .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:700px){
+ .sidebar{transform:translateX(-100%);transition:.25s;width:250px;box-shadow:0 0 30px #0001}
+ .sidebar.open{transform:translateX(0)}
+ .main{margin-left:0;width:100%}
+ .mobile-menu{display:inline-block}
+ .topbar{height:65px;padding:0 15px}
+ .topbar-title{font-size:16px}
+ .content{padding:20px 14px}
+ .welcome{padding:24px}
+ .welcome-art{display:none}
+ .stats{gap:10px}
+ .stat-card{padding:15px}
+ .stat-card h3{font-size:21px}
+ .service-grid{grid-template-columns:1fr}
+ .section-head{align-items:flex-start;flex-direction:column}
+ .form-grid{grid-template-columns:1fr}
+ .field.full,.price-box{grid-column:auto}
+ .topbar-right{gap:8px}
+}
+</style>
+</head>
+
+<body>
+<div class="layout">
+<aside class="sidebar" id="sidebar">
+  <div class="brand">☁ Cloud<span>Nova</span></div>
+  <div class="nav-label">WORKSPACE</div>
+  <button class="nav-btn active" data-page="dashboard"><span class="nav-icon">▦</span> Dashboard</button>
+  <button class="nav-btn" data-page="services"><span class="nav-icon">☁</span> Cloud Services</button>
+  <button class="nav-btn" data-page="bookings"><span class="nav-icon">▤</span> My Bookings</button>
+  <div class="nav-label">PREFERENCES</div>
+  <button class="nav-btn" data-page="settings"><span class="nav-icon">⚙</span> Settings</button>
+  <button class="nav-btn" id="helpBtn"><span class="nav-icon">ⓘ</span> Help & Support</button>
+  <div class="sidebar-bottom">
+    <strong>☁ CloudNova Demo</strong>
+    <p>Manage your cloud resources in one place.</p>
+    <button class="btn btn-light" id="quickBook" style="width:100%">+ New Booking</button>
+  </div>
+</aside>
+
+<main class="main">
+<header class="topbar">
+  <div style="display:flex;align-items:center;gap:12px">
+    <button class="icon-btn mobile-menu" id="menuBtn" aria-label="Open menu">☰</button>
+    <div class="topbar-title" id="pageTitle">Dashboard Overview</div>
+  </div>
+  <div class="topbar-right">
+    <button class="icon-btn" id="notificationBtn" aria-label="Notifications">♧</button>
+    <div class="avatar" id="topAvatar">G</div>
+    <strong id="topName" style="font-size:12px">Guest User</strong>
+  </div>
+</header>
+
+<div class="content">
+
+<!-- DASHBOARD -->
+<section class="page active" id="dashboard">
+  <div class="welcome">
+    <div>
+      <p style="font-size:11px;letter-spacing:2px;font-weight:800;margin-bottom:12px">CLOUD MANAGEMENT PLATFORM</p>
+      <h1>Welcome back, <span id="welcomeName">Guest</span>!</h1>
+      <p>Manage your cloud services, track your bookings and discover the right infrastructure for your next big idea.</p>
+      <button class="btn btn-white" id="exploreBtn">Explore Services →</button>
+    </div>
+    <div class="welcome-art">☁</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card"><div class="stat-top"><span class="subtext">Total Bookings</span><span class="stat-icon">▤</span></div><h3 id="totalStat">0</h3><p>All recorded bookings</p></div>
+    <div class="stat-card"><div class="stat-top"><span class="subtext">Active Bookings</span><span class="stat-icon">✓</span></div><h3 id="activeStat">0</h3><p>Currently confirmed</p></div>
+    <div class="stat-card"><div class="stat-top"><span class="subtext">Cloud Services</span><span class="stat-icon">☁</span></div><h3 id="serviceStat">4</h3><p>Available service types</p></div>
+    <div class="stat-card"><div class="stat-top"><span class="subtext">Monthly Cost</span><span class="stat-icon">₹</span></div><h3 id="costStat">₹0</h3><p>Confirmed plans combined</p></div>
+  </div>
+
+  <div class="section-head">
+    <div><h2>Popular Cloud Services</h2><p class="subtext">Select a service to get started.</p></div>
+    <button class="btn btn-light" data-goto="services">View all services →</button>
+  </div>
+  <div class="service-grid" id="featuredServices"></div>
+
+  <div class="section-head">
+    <div><h2>Recent Bookings</h2><p class="subtext">Your latest activity.</p></div>
+    <button class="btn btn-outline" data-goto="bookings">View all</button>
+  </div>
+  <div class="panel"><div class="table-wrap"><table>
+    <thead><tr><th>Booking ID</th><th>Service</th><th>Plan</th><th>Price/month</th><th>Status</th></tr></thead>
+    <tbody id="recentRows"></tbody>
+  </table></div><div class="empty" id="recentEmpty">No bookings yet. Book your first cloud service!</div></div>
+</section>
+
+<!-- SERVICES -->
+<section class="page" id="services">
+  <div class="section-head" style="margin-top:0">
+    <div><h2>Cloud Service Marketplace</h2><p class="subtext">Find the right cloud solution for your needs.</p></div>
+    <span class="tag">4 SERVICES AVAILABLE</span>
+  </div>
+  <div class="toolbar"><input id="serviceSearch" placeholder="Search cloud services..." aria-label="Search services"><select id="categoryFilter" aria-label="Filter services"><option value="all">All services</option><option value="Storage">Storage</option><option value="Compute">Compute</option><option value="Web">Web</option><option value="Database">Database</option></select></div>
+  <div class="service-grid" id="allServices"></div>
+  <div class="empty" id="serviceEmpty" style="display:none">No matching services found.</div>
+</section>
+
+<!-- BOOKINGS -->
+<section class="page" id="bookings">
+  <div class="section-head" style="margin-top:0">
+    <div><h2>Booking Management</h2><p class="subtext">View, search and manage your cloud bookings.</p></div>
+    <button class="btn btn-primary" id="newBookingBtn">+ New Booking</button>
+  </div>
+  <div class="stats" style="margin-top:20px">
+    <div class="stat-card"><p>Total bookings</p><h3 id="bookingTotal">0</h3></div>
+    <div class="stat-card"><p>Confirmed</p><h3 id="bookingActive">0</h3></div>
+    <div class="stat-card"><p>Cancelled</p><h3 id="bookingCancelled">0</h3></div>
+    <div class="stat-card"><p>Monthly spend</p><h3 id="bookingSpend">₹0</h3></div>
+  </div>
+  <div class="panel">
+    <div class="toolbar" style="margin-top:0"><input id="bookingSearch" placeholder="Search ID, service or customer..." aria-label="Search bookings"><select id="statusFilter" aria-label="Filter booking status"><option value="all">All statuses</option><option value="Confirmed">Confirmed</option><option value="Cancelled">Cancelled</option></select><button class="btn btn-outline" id="exportBtn">↓ Export CSV</button></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Booking ID</th><th>Service</th><th>Customer</th><th>Plan</th><th>Start Date</th><th>Monthly Price</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody id="bookingRows"></tbody>
+    </table></div>
+    <div class="empty" id="bookingEmpty">No bookings match your search.</div>
+  </div>
+</section>
+
+<!-- SETTINGS -->
+<section class="page" id="settings">
+  <div class="section-head" style="margin-top:0"><div><h2>Account Settings</h2><p class="subtext">Personalize your CloudNova experience.</p></div></div>
+  <div class="panel settings-card">
+    <div class="profile-box"><div class="avatar" id="settingsAvatar">G</div><div><h3 id="settingsDisplayName">Guest User</h3><p class="subtext">CloudNova demo profile</p></div></div>
+    <form id="settingsForm">
+      <div class="form-grid">
+        <div class="field full"><label for="profileName">Display name</label><input id="profileName" maxlength="60" required placeholder="Your name"></div>
+        <div class="field full"><label for="profileEmail">Email address</label><input id="profileEmail" type="email" maxlength="120" required placeholder="you@example.com"></div>
+        <div class="field full"><label for="currencyInfo">Display currency</label><select id="currencyInfo"><option value="INR">Indian Rupee (INR)</option></select></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap">
+        <button class="btn btn-primary" type="submit">Save Profile</button>
+        <button class="btn btn-danger" type="button" id="clearDataBtn">Clear Demo Data</button>
+      </div>
+    </form>
+    <p class="subtext" style="margin-top:18px">Demo note: your profile and bookings are stored in this browser only.</p>
+  </div>
+</section>
+
+<footer>© 2026 CloudNova · Cloud Service Booking Platform · Portfolio Demo</footer>
+</div>
+</main>
+</div>
+
+<!-- BOOKING MODAL -->
+<div class="overlay" id="bookingOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+    <div class="modal-head"><h2 id="modalTitle">Book Cloud Service</h2><button class="close-btn" data-close="bookingOverlay" aria-label="Close">✕</button></div>
+    <div id="bookingNotice" class="notice" role="status"></div>
+    <form id="bookingForm">
+      <div class="form-grid">
+        <div class="field full"><label for="customerName">Full name *</label><input id="customerName" maxlength="100" required placeholder="Enter your name"></div>
+        <div class="field full"><label for="customerEmail">Email address *</label><input id="customerEmail" type="email" maxlength="150" required placeholder="you@example.com"></div>
+        <div class="field full"><label for="serviceChoice">Cloud service *</label><select id="serviceChoice" required></select></div>
+        <div class="field"><label for="planChoice">Subscription plan *</label><select id="planChoice"><option value="Basic">Basic</option><option value="Standard">Standard</option><option value="Premium">Premium</option></select></div>
+        <div class="field"><label for="dateChoice">Start date *</label><input type="date" id="dateChoice" required></div>
+        <div class="price-box"><span><b>Estimated monthly cost</b><br><small class="subtext">Illustrative demo pricing</small></span><strong id="estimatedPrice">₹0</strong></div>
+        <div class="field full"><button type="submit" class="btn btn-primary" id="confirmBtn" style="width:100%">Confirm Booking →</button></div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- DEMO LOGIN MODAL -->
+<div class="overlay" id="loginOverlay" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+  <div class="modal">
+    <div class="modal-head"><h2 id="loginTitle">Welcome to CloudNova</h2><button class="close-btn" data-close="loginOverlay">✕</button></div>
+    <p class="subtext" style="margin-bottom:20px">Enter a display name to personalize this local demo.</p>
+    <form id="loginForm">
+      <div class="field"><label for="loginName">Your name</label><input id="loginName" maxlength="60" required placeholder="e.g. Alex"></div>
+      <div class="field" style="margin-top:15px"><label for="loginEmail">Email address</label><input id="loginEmail" type="email" maxlength="120" required placeholder="you@example.com"></div>
+      <button type="submit" class="btn btn-primary" style="width:100%;margin-top:20px">Continue to Dashboard →</button>
+    </form>
+    <p class="subtext" style="margin-top:15px">This is a demo profile, not secure account authentication.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+"use strict";
+
+// CLOUDNOVA: single-file interactive portfolio demo.
+// Browser storage only; no real authentication or cloud provisioning.
+
+const SERVICES = [
+  {id:"storage",name:"Cloud Storage",category:"Storage",icon:"☁️",price:299,description:"Secure file storage, backup and convenient access to your data."},
+  {id:"hosting",name:"Web Hosting",category:"Web",icon:"🌐",price:499,description:"Reliable hosting for websites, landing pages and web applications."},
+  {id:"server",name:"Virtual Server",category:"Compute",icon:"🖥️",price:999,description:"Flexible virtual computing resources for development and deployment."},
+  {id:"database",name:"Cloud Database",category:"Database",icon:"🗄️",price:699,description:"Organize your project data with a managed database service."}
+];
+
+const MULTIPLIERS = {Basic:1,Standard:2,Premium:3};
+const $ = id => document.getElementById(id);
+const safeRead = (key,fallback) => {
+  try {const v=localStorage.getItem(key);return v===null?fallback:JSON.parse(v);}
+  catch{return fallback;}
+};
+let bookings = safeRead("cloudnova_bookings_v1",[]);
+if(!Array.isArray(bookings)) bookings=[];
+let profile = safeRead("cloudnova_profile_v1",null);
+if(!profile || typeof profile!=="object") profile=null;
+
+const money = n => new Intl.NumberFormat("en-IN",{
+  style:"currency",currency:"INR",maximumFractionDigits:0
+}).format(Number(n)||0);
+
+function persist(){
+  try{
+    localStorage.setItem("cloudnova_bookings_v1",JSON.stringify(bookings));
+    return true;
+  }catch{
+    toast("Could not save data. Check browser storage settings.");
+    return false;
+  }
+}
+function saveProfile(){
+  try{localStorage.setItem("cloudnova_profile_v1",JSON.stringify(profile));return true;}
+  catch{toast("Could not save profile.");return false;}
+}
+function escapeHTML(value){
+  return String(value??"").replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[c]);
+}
+function toast(message){
+  $("toast").textContent=message;
+  $("toast").classList.add("show");
+  clearTimeout(toast.timer);
+  toast.timer=setTimeout(()=>$("toast").classList.remove("show"),3000);
+}
+function showOverlay(id){$(id).classList.add("open");}
+function closeOverlay(id){$(id).classList.remove("open");}
+function localDate(){
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+$("dateChoice").min=localDate();
+$("dateChoice").value=localDate();
+
+function renderServiceCard(s){
+  return `<article class="service-card">
+    <div class="service-icon">${s.icon}</div>
+    <h3>${escapeHTML(s.name)}</h3>
+    <p>${escapeHTML(s.description)}</p>
+    <div class="service-price">${money(s.price)} <small>/ month</small></div>
+    <div class="service-footer"><span class="tag">${escapeHTML(s.category)}</span>
+    <button class="btn btn-primary" data-book-service="${s.id}">Book now →</button></div>
+  </article>`;
+}
+function renderServices(){
+  const query=$("serviceSearch").value.trim().toLowerCase();
+  const category=$("categoryFilter").value;
+  const results=SERVICES.filter(s=>
+    (s.name+" "+s.description+" "+s.category).toLowerCase().includes(query)&&
+    (category==="all"||s.category===category)
+  );
+  $("allServices").innerHTML=results.map(renderServiceCard).join("");
+  $("serviceEmpty").style.display=results.length?"none":"block";
+  $("featuredServices").innerHTML=SERVICES.slice(0,3).map(renderServiceCard).join("");
+  $("serviceChoice").innerHTML=SERVICES.map(s=>
+    `<option value="${s.id}">${escapeHTML(s.name)} — ${money(s.price)}/mo</option>`
+  ).join("");
+  updatePrice();
+}
+function getPrice(serviceId,plan){
+  const service=SERVICES.find(s=>s.id===serviceId);
+  return service?service.price*(MULTIPLIERS[plan]||1):0;
+}
+function updatePrice(){
+  if(!$("serviceChoice"))return;
+  $("estimatedPrice").textContent=money(getPrice($("serviceChoice").value,$("planChoice").value))+"/mo";
+}
+function statusHTML(status){
+  const cls=status==="Cancelled"?"cancelled":status==="Pending"?"pending":"";
+  return `<span class="status ${cls}">${escapeHTML(status)}</span>`;
+}
+function renderStats(){
+  const active=bookings.filter(b=>b.status==="Confirmed");
+  const cancelled=bookings.filter(b=>b.status==="Cancelled");
+  const cost=active.reduce((sum,b)=>sum+(Number(b.price)||0),0);
+  $("totalStat").textContent=bookings.length;
+  $("activeStat").textContent=active.length;
+  $("serviceStat").textContent=SERVICES.length;
+  $("costStat").textContent=money(cost);
+  $("bookingTotal").textContent=bookings.length;
+  $("bookingActive").textContent=active.length;
+  $("bookingCancelled").textContent=cancelled.length;
+  $("bookingSpend").textContent=money(cost);
+}
+function renderRecent(){
+  const recent=bookings.slice(0,5);
+  $("recentRows").innerHTML=recent.map(b=>`<tr>
+    <td><strong>${escapeHTML(b.id)}</strong></td>
+    <td>${escapeHTML(b.service)}</td>
+    <td>${escapeHTML(b.plan)}</td>
+    <td>${money(b.price)}</td><td>${statusHTML(b.status)}</td>
+  </tr>`).join("");
+  $("recentEmpty").style.display=recent.length?"none":"block";
+}
+function renderBookings(){
+  const query=$("bookingSearch").value.trim().toLowerCase();
+  const status=$("statusFilter").value;
+  const filtered=bookings.filter(b=>
+    [b.id,b.service,b.customer,b.email,b.plan].some(v=>String(v||"").toLowerCase().includes(query))&&
+    (status==="all"||b.status===status)
+  );
+  $("bookingRows").innerHTML=filtered.map(b=>`<tr>
+    <td><strong>${escapeHTML(b.id)}</strong></td>
+    <td>${escapeHTML(b.service)}</td>
+    <td>${escapeHTML(b.customer)}<br><span class="subtext">${escapeHTML(b.email)}</span></td>
+    <td>${escapeHTML(b.plan)}</td>
+    <td>${escapeHTML(b.startDate)}</td>
+    <td>${money(b.price)}</td><td>${statusHTML(b.status)}</td>
+    <td>${b.status==="Confirmed"
+      ?`<button class="btn btn-danger" data-cancel="${escapeHTML(b.id)}">Cancel</button>`
+      :`<button class="btn btn-outline" disabled>Cancelled</button>`}</td>
+  </tr>`).join("");
+  $("bookingEmpty").style.display=filtered.length?"none":"block";
+}
+function renderAll(){
+  renderStats();renderRecent();renderBookings();
+}
+function goTo(page){
+  if(!$("dashboard")||!$(page))return;
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  $(page).classList.add("active");
+  document.querySelectorAll(".nav-btn[data-page]").forEach(b=>
+    b.classList.toggle("active",b.dataset.page===page)
+  );
+  const titles={dashboard:"Dashboard Overview",services:"Cloud Services",bookings:"My Bookings",settings:"Account Settings"};
+  $("pageTitle").textContent=titles[page]||"CloudNova";
+  $("sidebar").classList.remove("open");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function updateProfileUI(){
+  const name=profile?.name||"Guest User";
+  const email=profile?.email||"";
+  $("topName").textContent=name;
+  $("topAvatar").textContent=name.trim().charAt(0).toUpperCase()||"G";
+  $("welcomeName").textContent=name.split(" ")[0];
+  $("settingsDisplayName").textContent=name;
+  $("settingsAvatar").textContent=name.trim().charAt(0).toUpperCase()||"G";
+  $("profileName").value=name==="Guest User"?"":name;
+  $("profileEmail").value=email;
+  $("customerName").value=name==="Guest User"?"":name;
+  $("customerEmail").value=email;
+}
+function openBooking(serviceId){
+  $("bookingNotice").className="notice";
+  $("bookingNotice").textContent="";
+  if(serviceId && SERVICES.some(s=>s.id===serviceId)){
+    $("serviceChoice").value=serviceId;
+  }
+  updatePrice();
+  showOverlay("bookingOverlay");
+}
+function makeBooking(event){
+  event.preventDefault();
+  const customer=$("customerName").value.trim();
+  const email=$("customerEmail").value.trim();
+  const service=SERVICES.find(s=>s.id===$("serviceChoice").value);
+  const plan=$("planChoice").value;
+  const startDate=$("dateChoice").value;
+  const date=new Date(startDate+"T00:00:00");
+
+  if(customer.length<2){return bookingError("Enter a name with at least 2 characters.");}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){return bookingError("Enter a valid email address.");}
+  if(!service){return bookingError("Please select a valid service.");}
+  if(!MULTIPLIERS[plan]){return bookingError("Please select a valid plan.");}
+  if(!startDate||Number.isNaN(date.getTime())||date.toISOString().slice(0,10)!==startDate||startDate<localDate()){
+    return bookingError("Select a valid date today or later.");
+  }
+  if(bookings.length>=500){return bookingError("Demo booking limit reached. Export your data or clear the demo data.");}
+
+  const booking={
+    id:"CN-"+Date.now().toString(36).toUpperCase()+"-"+Math.random().toString(36).slice(2,6).toUpperCase(),
+    customer:customer.slice(0,100),
+    email:email.slice(0,150),
+    serviceId:service.id,
+    service:service.name,
+    plan,
+    startDate,
+    price:getPrice(service.id,plan),
+    status:"Confirmed",
+    createdAt:new Date().toISOString()
+  };
+  bookings.unshift(booking);
+  if(!persist()){bookings.shift();return;}
+  if(!profile){
+    profile={name:booking.customer,email:booking.email};
+    saveProfile();updateProfileUI();
+  }
+  $("bookingForm").reset();
+  $("dateChoice").min=localDate();
+  $("dateChoice").value=localDate();
+  updatePrice();
+  closeOverlay("bookingOverlay");
+  renderAll();
+  goTo("bookings");
+  toast("Booking confirmed! ID: "+booking.id);
+}
+function bookingError(message){
+  $("bookingNotice").textContent=message;
+  $("bookingNotice").className="notice error show";
+}
+function cancelBooking(id){
+  const b=bookings.find(x=>x.id===id);
+  if(!b||b.status!=="Confirmed")return;
+  if(!confirm("Cancel booking "+id+"?"))return;
+  b.status="Cancelled";
+  if(!persist()){b.status="Confirmed";return;}
+  renderAll();
+  toast("Booking cancelled successfully.");
+}
+function exportCSV(){
+  if(!bookings.length){toast("There are no bookings to export.");return;}
+  const headers=["Booking ID","Customer","Email","Service","Plan","Start Date","Monthly Price INR","Status","Created At"];
+  const quote=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+  const rows=bookings.map(b=>[b.id,b.customer,b.email,b.service,b.plan,b.startDate,b.price,b.status,b.createdAt].map(quote).join(","));
+  const blob=new Blob(["\uFEFF"+[headers.map(quote).join(","),...rows].join("\r\n")],{type:"text/csv;charset=utf-8;"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download="cloudnova-bookings.csv";
+  document.body.appendChild(a);a.click();a.remove();
+  URL.revokeObjectURL(url);
+  toast("Bookings CSV exported.");
+}
+
+// Navigation
+document.querySelectorAll(".nav-btn[data-page]").forEach(btn=>
+  btn.addEventListener("click",()=>goTo(btn.dataset.page))
+);
+document.querySelectorAll("[data-goto]").forEach(btn=>
+  btn.addEventListener("click",()=>goTo(btn.dataset.goto))
+);
+$("menuBtn").addEventListener("click",()=>$("sidebar").classList.toggle("open"));
+$("exploreBtn").addEventListener("click",()=>goTo("services"));
+$("quickBook").addEventListener("click",()=>openBooking());
+$("newBookingBtn").addEventListener("click",()=>openBooking());
+$("serviceSearch").addEventListener("input",renderServices);
+$("categoryFilter").addEventListener("change",renderServices);
+$("bookingSearch").addEventListener("input",renderBookings);
+$("statusFilter").addEventListener("change",renderBookings);
+$("serviceChoice").addEventListener("change",updatePrice);
+$("planChoice").addEventListener("change",updatePrice);
+$("bookingForm").addEventListener("submit",makeBooking);
+$("exportBtn").addEventListener("click",exportCSV);
+
+document.addEventListener("click",event=>{
+  const book=event.target.closest("[data-book-service]");
+  if(book)openBooking(book.dataset.bookService);
+  const cancel=event.target.closest("[data-cancel]");
+  if(cancel)cancelBooking(cancel.dataset.cancel);
+  const close=event.target.closest("[data-close]");
+  if(close)closeOverlay(close.dataset.close);
+});
+document.querySelectorAll(".overlay").forEach(overlay=>
+  overlay.addEventListener("click",event=>{
+    if(event.target===overlay)closeOverlay(overlay.id);
+  })
+);
+document.addEventListener("keydown",event=>{
+  if(event.key==="Escape")document.querySelectorAll(".overlay.open").forEach(o=>closeOverlay(o.id));
+});
+
+// Demo profile
+$("loginForm").addEventListener("submit",event=>{
+  event.preventDefault();
+  const name=$("loginName").value.trim();
+  const email=$("loginEmail").value.trim();
+  if(name.length<2||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    toast("Please enter a valid name and email.");return;
+  }
+  profile={name:name.slice(0,60),email:email.slice(0,120)};
+  if(!saveProfile())return;
+  updateProfileUI();
+  closeOverlay("loginOverlay");
+  toast("Welcome to CloudNova, "+profile.name+"!");
+});
+$("settingsForm").addEventListener("submit",event=>{
+  event.preventDefault();
+  const name=$("profileName").value.trim();
+  const email=$("profileEmail").value.trim();
+  if(name.length<2||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    toast("Please enter a valid name and email.");return;
+  }
+  profile={name:name.slice(0,60),email:email.slice(0,120)};
+  if(!saveProfile())return;
+  updateProfileUI();
+  toast("Profile saved successfully.");
+});
+$("notificationBtn").addEventListener("click",()=>{
+  const active=bookings.filter(b=>b.status==="Confirmed").length;
+  alert("CloudNova Notifications\n\nYou have "+active+" confirmed booking(s).\n"+(active?"Your bookings are ready to manage.":"Book a cloud service to get started."));
+});
+$("helpBtn").addEventListener("click",()=>{
+  alert("CLOUDNOVA HELP & SUPPORT\n\n1. Open Cloud Services to explore plans.\n2. Click Book Now to create a booking.\n3. Use My Bookings to search, filter or cancel.\n4. Export CSV to save a copy of your bookings.\n5. Update your details in Account Settings.\n\nThis is a browser-based portfolio demo. No real cloud resources or payments are provisioned.");
+});
+$("clearDataBtn").addEventListener("click",()=>{
+  if(!confirm("Delete all demo bookings and reset the profile? This cannot be undone."))return;
+  const oldBookings=bookings;
+  const oldProfile=profile;
+  bookings=[];profile=null;
+  try{
+    localStorage.removeItem("cloudnova_bookings_v1");
+    localStorage.removeItem("cloudnova_profile_v1");
+  }catch{
+    bookings=oldBookings;profile=oldProfile;
+    toast("Could not clear browser storage.");return;
+  }
+  updateProfileUI();renderAll();toast("Demo data cleared.");
+});
+
+// Initial rendering
+renderServices();
+updateProfileUI();
+renderAll();
+if(!profile)setTimeout(()=>showOverlay("loginOverlay"),400);
+</script>
+</body>
+</html>
